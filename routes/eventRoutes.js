@@ -4,58 +4,62 @@ const {
   authenticateUser,
   authorizePermissions,
 } = require("../middleware/authentication");
-// const uploadImage = require("../middleware/uploadImage"); // Import the middleware for handling image uploads
 
-const {
-  deleteevent,
-  updateevents,
-  getSingleevent,
-  createevent,
-  getAllevents,
-  createEventImage,
-  editEventImage,
-  deleteEventImage,
-} = require("../controllers/eventController");
 
-// Create Event Image - POST /api/v1/events/createeventImage
-router.post(
-  "/createeventImage",
-  [
-    authenticateUser,
-    authorizePermissions("admin"),
-    uploadImage.single("eventImage"),
-  ],
-  createEventImage
+const eventControllers = require("../controllers/eventController");
+
+// Route for creating a new event with an image upload
+router.post('/createimage', authenticateUser, authorizePermissions("admin"), eventControllers.createEvent);
+
+// Route for editing an existing event with a new image upload
+router.put(
+  "/editimage/:id",
+  authenticateUser,
+  authorizePermissions("admin"),
+  eventControllers.editEvent
 );
 
-// Edit Event Image - PATCH /api/v1/events/editEventImage/:id
-router.patch(
-  "/editEventImage/:id",
-  [
-    authenticateUser,
-    authorizePermissions("admin"),
-    uploadImage.single("eventImage"),
-  ],
-  editEventImage
-);
-
-// Delete Event Image - DELETE /api/v1/events/deleteEventImage/:id
+// Route for deleting an event
 router.delete(
-  "/deleteEventImage/:id",
-  [authenticateUser, authorizePermissions("admin")],
-  deleteEventImage
+  "/deleteimage/:id",
+  authenticateUser,
+  authorizePermissions("admin"),
+  eventControllers.deleteEvent
 );
 
-// Rest of your existing routes for managing events
-router
-  .route("/")
-  .post([authenticateUser, authorizePermissions("admin")], createevent)
-  .get(getAllevents);
 
-router
-  .route("/:id")
-  .get(getSingleevent)
-  .patch([authenticateUser, authorizePermissions("admin")], updateevents)
-  .delete([authenticateUser, authorizePermissions("admin")], deleteevent);
+// Route for creating a new event
+router.post(
+  "/create",
+  authenticateUser,
+  authorizePermissions("admin"),
+  eventControllers.createevent
+);
+
+// Route for retrieving all events
+router.get('/', eventControllers.getAllevents);
+
+// Route for retrieving a single event by ID
+router.get(
+  "/:id",
+  authenticateUser,
+  eventControllers.getSingleevent
+);
+
+// Route for updating an existing event by ID
+router.put(
+  "/:id",
+  authenticateUser,
+  authorizePermissions("admin"),
+  eventControllers.updateevents
+);
+
+// Route for deleting an event by ID
+router.delete(
+  "/:id",
+  authenticateUser,
+  authorizePermissions("admin"),
+  eventControllers.deleteevent
+);
 
 module.exports = router;
